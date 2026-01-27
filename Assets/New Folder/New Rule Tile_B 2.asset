@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d1514134bc4fbd41bb739b1b9a49231, type: 3}
-  m_Name: New Rule Tile_B
+  m_Name: New Rule Tile_B 2
   m_EditorClassIdentifier: Unity.2D.Tilemap.Extras::UnityEngine.RuleTile
-  m_DefaultSprite: {fileID: -1472092635, guid: a3e2e1f6e972b704db0a559aa920d3d2, type: 3}
+  m_DefaultSprite: {fileID: 1200761096, guid: a3e2e1f6e972b704db0a559aa920d3d2, type: 3}
   m_DefaultGameObject: {fileID: 0}
   m_DefaultColliderType: 1
   m_TilingRules:
   - m_Id: 0
     m_Sprites:
-    - {fileID: -1472092635, guid: a3e2e1f6e972b704db0a559aa920d3d2, type: 3}
+    - {fileID: 1200761096, guid: a3e2e1f6e972b704db0a559aa920d3d2, type: 3}
     m_GameObject: {fileID: 0}
     m_MinAnimationSpeed: 1
     m_MaxAnimationSpeed: 1
@@ -33,7 +33,7 @@ MonoBehaviour:
     m_RuleTransform: 0
   - m_Id: 1
     m_Sprites:
-    - {fileID: -251739666, guid: a3e2e1f6e972b704db0a559aa920d3d2, type: 3}
+    - {fileID: -2079129262, guid: a3e2e1f6e972b704db0a559aa920d3d2, type: 3}
     m_GameObject: {fileID: 0}
     m_MinAnimationSpeed: 1
     m_MaxAnimationSpeed: 1
@@ -48,7 +48,7 @@ MonoBehaviour:
     m_RuleTransform: 0
   - m_Id: 2
     m_Sprites:
-    - {fileID: -209075361, guid: a3e2e1f6e972b704db0a559aa920d3d2, type: 3}
+    - {fileID: -123124462, guid: a3e2e1f6e972b704db0a559aa920d3d2, type: 3}
     m_GameObject: {fileID: 0}
     m_MinAnimationSpeed: 1
     m_MaxAnimationSpeed: 1
