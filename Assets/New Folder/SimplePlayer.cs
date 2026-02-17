@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.UIElements.Experimental;
+
 
 public class SimplePlayer : MonoBehaviour // library สำหรับตอน gameplay
 {
@@ -11,6 +13,27 @@ public class SimplePlayer : MonoBehaviour // library สำหรับตอน
     [SerializeField] private LayerMask groundLayer; // หาเฉพาะ layer ของพื้น
     public bool isGrounded = false; // ตรวจชนพื้น
     public bool isWalled = false;  // ตรวจชนกำแพง
+
+    [Header("Move")]
+    [SerializeField] private float moveSpeed = 5f;
+    private float X_input;
+    private float Y_input;
+
+    
+
+    [Header("Jump")]
+    [SerializeField] private float jumpForce = 20f;
+    [SerializeField] private Vector2 wallJumpForce = new Vector2(10f, 15f);
+    private bool isJumping = false;
+    private bool isWallJumping = false;
+    private bool isWallSliding = false;
+    private bool canDoubleJump = false;
+    public int facing = 1;
+
+    [SerializeField] private float coyoteTimeLimit = .5f;
+    [SerializeField] private float bufferTimeLimit = .5f;
+    private float coyoteTime;
+    private float bufferTime;
 
     private void Awake() // ทำงานก่อนเข้ามาใน game
     {
@@ -30,26 +53,132 @@ public class SimplePlayer : MonoBehaviour // library สำหรับตอน
     }
     private void JumpState()
     {
+        if (!isGrounded && !isJumping) // takeoff
+        {
+            isJumping = true;
+
+            if (rigid.linearVelocityY <= 0f) // เริ่มนับ coyoteJump
+            {
+                coyoteTime = Time.time;
+            }
+        }
+
+        if (isGrounded && isJumping) // landing
+        {
+            isJumping = false;
+            isWallJumping = false;
+            isWallSliding = false;
+            canDoubleJump = false;
+        }
+
+        if (isWalled) // wallSlide
+        {
+            isJumping = false;
+            isWallJumping = false;
+            canDoubleJump = false;
+
+            if (isGrounded)
+            {
+                isWallSliding = false;
+            }
+            else
+            {
+                isWallSliding = true;
+            }
+        }
+        else // ยกเลิก wallSlide
+        {
+            isWallSliding = false;
+        }
 
     }
     private void Jump()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (!isWalled)
+            {
+                if (isGrounded) // *** normalJump
+                {
+                    canDoubleJump = true;
+                    rigid.linearVelocity = new Vector2(rigid.linearVelocityX, jumpForce);
+                }
+                else // doubleJump, coyoteJump
+                {
+                    if (rigid.linearVelocityY > 0f && canDoubleJump) // *** doubleJump
+                    {
+                        canDoubleJump = false;
+                        rigid.linearVelocity = new Vector2(rigid.linearVelocityX, jumpForce);
+                    }
 
+                    if (rigid.linearVelocityY <= 0f)
+                    {
+                        if (Time.time < coyoteTime + coyoteTimeLimit) // *** coyoteJump
+                        {
+                            coyoteTime = 0f;
+                            rigid.linearVelocity = new Vector2(rigid.linearVelocityX, jumpForce);
+                        }
+                        else // เริ่มนับ bufferJump
+                        {
+                            bufferTime = Time.time;
+                        }
+                    }
+                }
+            }
+            else // *** wallJump
+            {
+                isWallJumping = true;
+                rigid.linearVelocity = new Vector2(wallJumpForce.x * facing, wallJumpForce.y);
+            }
+        }
+        else // *** bufferJump
+        {
+            if (isGrounded && Time.time < bufferTime + bufferTimeLimit)
+            {
+                rigid.linearVelocity = new Vector2(rigid.linearVelocityX, jumpForce);
+            }
+        }
     }
     private void WallSlide()
     {
+        if (!isWalled || isGrounded || isWallJumping || rigid.linearVelocityY > 0f)
+            return;
 
+        float Y_slide = Y_input < 0f ? 1f : .5f;
+        rigid.linearVelocity = new Vector2(X_input * moveSpeed, rigid.linearVelocityY * Y_slide);
     }
     private void InputVal()
     {
-
+        X_input = Input.GetAxisRaw("Horizontal");
+        Y_input = Input.GetAxisRaw("Vertical");
     }
     private void Move()
     {
+        if (isWallJumping || isWallSliding)
+            return;
 
+        if (isGrounded)
+        {
+            rigid.linearVelocity = new Vector2(X_input * moveSpeed, rigid.linearVelocityY);
+        }
+        else
+        {
+            float X_airMove = X_input != 0f ? X_input * moveSpeed : rigid.linearVelocityX;
+            rigid.linearVelocity = new Vector2(X_airMove, rigid.linearVelocityY);
+        }
     }
     private void Flip()
     {
+        if (rigid.linearVelocityX > 0.1f)
+        {
+            facing = -1;
+            transform.rotation = Quaternion.identity;
+        }
+        else if (rigid.linearVelocityX < -0.1f)
+        {
+            facing = 1;
+            transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+        }
 
     }
     private void GroundAndWallCheck()
@@ -66,6 +195,14 @@ public class SimplePlayer : MonoBehaviour // library สำหรับตอน
     }
     private void Animation()
     {
+        anim.SetBool("isGrounded", isGrounded);
+        anim.SetBool("isWallSliding", isWallSliding);
 
+        if (!isWalled)
+            anim.SetFloat("velX", rigid.linearVelocityX);
+        else
+            anim.SetFloat("velX", 0f);
+
+        anim.SetFloat("velY", rigid.linearVelocityY);
     }
 }
