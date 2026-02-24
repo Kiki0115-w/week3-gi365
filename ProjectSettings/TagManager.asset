@@ -44,5 +44,8 @@ TagManager:
   - name: Sky
     uniqueID: 1884461917
     locked: 0
+  - name: Player
+    uniqueID: 550026593
+    locked: 0
   m_RenderingLayers:
   - Default

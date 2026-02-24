@@ -6,6 +6,8 @@ public class SimplePlayer : MonoBehaviour // library สำหรับตอน
 {
     private Rigidbody2D rigid; // สำหรับการเคลื่อนที่
     private Animator anim; // สำหรับ animation
+    private ParticleSystem grassPar;
+    private ParticleSystem.EmissionModule emission;
 
     [Header("Ground And Wall Check")]
     [SerializeField] private float groundDistCheck = 1f; // ระยะ sensor ที่วิ่งไปชนพื้น
@@ -32,13 +34,16 @@ public class SimplePlayer : MonoBehaviour // library สำหรับตอน
 
     [SerializeField] private float coyoteTimeLimit = .5f;
     [SerializeField] private float bufferTimeLimit = .5f;
-    private float coyoteTime;
-    private float bufferTime;
+    private float coyoteTime = -10f;
+    private float bufferTime = -10f;
 
     private void Awake() // ทำงานก่อนเข้ามาใน game
     {
         rigid = GetComponent<Rigidbody2D>(); // มันอยู่ที่ gameobject นี้
         anim = GetComponentInChildren<Animator>(); // ใช้ InChildren เพราะ Animator อยู่ที่ลูก
+        grassPar = GetComponentInChildren<ParticleSystem>();
+        emission = grassPar.emission; //ดึงข้อมูล
+
     }
     private void Update() // ทำงานทุก frame
     {
@@ -195,14 +200,22 @@ public class SimplePlayer : MonoBehaviour // library สำหรับตอน
     }
     private void Animation()
     {
-        anim.SetBool("isGrounded", isGrounded);
+        anim.SetBool("isGrounded", isGrounded); //ลอยบนพื้น
         anim.SetBool("isWallSliding", isWallSliding);
 
-        if (!isWalled)
-            anim.SetFloat("velX", rigid.linearVelocityX);
-        else
+        /*if (!isWalled)
+        {
             anim.SetFloat("velX", 0f);
+        }    
+            
+        else
+        {
+            
+        }*/
 
+        anim.SetFloat("velX", rigid.linearVelocityX);
         anim.SetFloat("velY", rigid.linearVelocityY);
+
+        emission.enabled = isGrounded; 
     }
 }
